@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:int="http://www.springframework.org/schema/integration"
+       xmlns:file="http://www.springframework.org/schema/integration/file"
+       xmlns:feed="http://www.springframework.org/schema/integration/feed"
+       xmlns:int-mongodb="http://www.springframework.org/schema/integration/mongodb"
+       xmlns:mongo="http://www.springframework.org/schema/data/mongo"
+       xsi:schemaLocation="http://www.springframework.org/schema/integration/feed http://www.springframework.org/schema/integration/feed/spring-integration-feed.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	    http://www.springframework.org/schema/data/mongo http://www.springframework.org/schema/data/mongo/spring-mongo.xsd
+		http://www.springframework.org/schema/integration/file http://www.springframework.org/schema/integration/file/spring-integration-file.xsd
+		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+       http://www.springframework.org/schema/integration/mongodb http://www.springframework.org/schema/integration/mongodb/spring-integration-mongodb.xsd">
+
+
+<!--<feed:inbound-channel-adapter id="news" url="https://seroter.wordpress.com/feed" auto-startup="${auto.startup:true}">
+        <int:poller fixed-rate="5000"/>
+    </feed:inbound-channel-adapter>-->
+
+    <feed:inbound-channel-adapter id="feedAdapter"
+                                      url="http://feeds.bbci.co.uk/news/rss.xml">
+        <int:poller fixed-rate="10000" max-messages-per-poll="100" />
+    </feed:inbound-channel-adapter>
+    <int:transformer
+            input-channel="feedAdapter"
+            expression="payload.title + ' @ ' + payload.link + '#{systemProperties['line.separator']}'"
+            output-channel="adapterWithConverter"/>
+
+    <file:outbound-channel-adapter id="file"
+                                   mode="APPEND"
+                                   charset="UTF-8"
+                                   directory="/tmp/si"
+                                   filename-generator-expression="'${feed.file.name:SpringBlog}'"/>
+    <mongo:db-factory id="mongoDbFactory" dbname="test"/>
+
+   <!-- <int-mongodb:outbound-channel-adapter id="deafultAdapter" />
+-->
+ <int-mongodb:outbound-channel-adapter id="adapterWithConverter" mongo-converter="stringConverter"/>
+
+    <!-- 	mongo-converter="stringConverter" -->
+
+    <bean id="stringConverter" class="com.dns.feedbox.StringConverter">
+        <constructor-arg ref="mongoDbFactory"/>
+        <constructor-arg>
+            <bean class="org.springframework.data.mongodb.core.mapping.MongoMappingContext"/>
+        </constructor-arg>
+    </bean>
+
+
+</beans>
