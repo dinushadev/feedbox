@@ -19,33 +19,38 @@
     </feed:inbound-channel-adapter>-->
 
     <feed:inbound-channel-adapter id="feedAdapter"
-                                      url="http://feeds.bbci.co.uk/news/rss.xml">
-        <int:poller fixed-rate="10000" max-messages-per-poll="100" />
+                                      url="http://rss.cnn.com/rss/cnn_latest.rss">
+        <int:poller fixed-rate="1000" max-messages-per-poll="2" />
     </feed:inbound-channel-adapter>
-    <int:transformer
-            input-channel="feedAdapter"
-            expression="payload.title + ' @ ' + payload.link + '#{systemProperties['line.separator']}'"
-            output-channel="adapterWithConverter"/>
+    <int:transformer id="testTransformer" ref="testTransformerBean" input-channel="feedAdapter"
+                     method="transformToFeed" output-channel="mongoOut"/>
+    <bean id="testTransformerBean" class="com.dns.feedbox.FeedTransformer" />
+  <!--  <file:outbound-channel-adapter id="file"
+                                   mode="APPEND"
+                                   charset="UTF-8"
+                                   directory="/tmp/si"
+                                   filename-generator-expression="'${feed.file.name:SpringBlog}'"/>-->
+    <mongo:db-factory id="mongoDbFactory" dbname="feed"/>
+
+    <int-mongodb:outbound-channel-adapter id="mongoOut" />
 
     <file:outbound-channel-adapter id="file"
                                    mode="APPEND"
                                    charset="UTF-8"
                                    directory="/tmp/si"
                                    filename-generator-expression="'${feed.file.name:SpringBlog}'"/>
-    <mongo:db-factory id="mongoDbFactory" dbname="test"/>
 
-   <!-- <int-mongodb:outbound-channel-adapter id="deafultAdapter" />
+   <!-- <int:json-to-object-transformer input-channel="objectMapperInput"
+                                    type="com.dns.feedbox.Feed" object-mapper="customObjectMapper"/>
 -->
- <int-mongodb:outbound-channel-adapter id="adapterWithConverter" mongo-converter="stringConverter"/>
-
     <!-- 	mongo-converter="stringConverter" -->
 
-    <bean id="stringConverter" class="com.dns.feedbox.StringConverter">
+   <!-- <bean id="stringConverter" class="com.dns.feedbox.StringConverter">
         <constructor-arg ref="mongoDbFactory"/>
         <constructor-arg>
             <bean class="org.springframework.data.mongodb.core.mapping.MongoMappingContext"/>
         </constructor-arg>
-    </bean>
+    </bean>-->
 
 
 </beans>

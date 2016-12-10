@@ -1,4 +1,7 @@
 package com.dns.feedbox;
+
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.springframework.data.mapping.context.MappingContext;
@@ -8,9 +11,6 @@ import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.core.mapping.MongoPersistentEntity;
 import org.springframework.data.mongodb.core.mapping.MongoPersistentProperty;
 import org.springframework.util.StringUtils;
-
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
 
 /**
  *
@@ -25,6 +25,17 @@ public class StringConverter extends MappingMongoConverter {
 	}
 
 	@Override
+	public void write(Object obj, DBObject dbo) {
+		String source = (String) obj;
+		System.out.println("data: "+source);
+	}
+
+	@Override
+	public <S> S read(Class<S> clazz, DBObject dbo) {
+		return super.read(clazz, dbo);
+	}
+
+	/*@Override
 	public void write(Object source, Bson target) {
 		Document document = (Document) target;
 		String strPerson = (String) source;
@@ -39,6 +50,7 @@ public class StringConverter extends MappingMongoConverter {
 		document.put("address", innerObject);
 	}
 
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public <S> S read(Class<S> clazz, Bson source) {
@@ -50,5 +62,5 @@ public class StringConverter extends MappingMongoConverter {
 				+ document.get("zip") + ", "
 				+ document.get("state") + ", ");
 	}
-
+*/
 }
