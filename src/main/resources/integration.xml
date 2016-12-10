@@ -24,7 +24,7 @@
     </feed:inbound-channel-adapter>
     <int:transformer id="testTransformer" ref="testTransformerBean" input-channel="feedAdapter"
                      method="transformToFeed" output-channel="mongoOut"/>
-    <bean id="testTransformerBean" class="com.dns.feedbox.FeedTransformer" />
+    <bean id="testTransformerBean" class="com.dns.feedbox.util.FeedTransformer" />
   <!--  <file:outbound-channel-adapter id="file"
                                    mode="APPEND"
                                    charset="UTF-8"
@@ -41,7 +41,7 @@
                                    filename-generator-expression="'${feed.file.name:SpringBlog}'"/>
 
    <!-- <int:json-to-object-transformer input-channel="objectMapperInput"
-                                    type="com.dns.feedbox.Feed" object-mapper="customObjectMapper"/>
+                                    type="com.dns.feedbox.entity.Feed" object-mapper="customObjectMapper"/>
 -->
     <!-- 	mongo-converter="stringConverter" -->
 
