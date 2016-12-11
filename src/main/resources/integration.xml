@@ -19,7 +19,7 @@
     </feed:inbound-channel-adapter>-->
 
     <feed:inbound-channel-adapter id="feedAdapter"
-                                      url="http://rss.cnn.com/rss/cnn_latest.rss">
+                                      url="http://feeds.mashable.com/Mashable?format=xml">
         <int:poller fixed-rate="1000" max-messages-per-poll="2" />
     </feed:inbound-channel-adapter>
     <int:transformer id="testTransformer" ref="testTransformerBean" input-channel="feedAdapter"
@@ -34,6 +34,10 @@
 
     <int-mongodb:outbound-channel-adapter id="mongoOut" />
 
+    <bean id="metadataStore"
+          class="org.springframework.integration.metadata.PropertiesPersistingMetadataStore">
+        <property name="baseDirectory" value="./" />
+    </bean>
     <file:outbound-channel-adapter id="file"
                                    mode="APPEND"
                                    charset="UTF-8"
